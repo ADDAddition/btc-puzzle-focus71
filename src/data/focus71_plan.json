@@ -1,0 +1,13 @@
+{
+  "mode": "FOCUS71_ONLY",
+  "pubkey_now": null,
+  "note_fr": "Pubkey #71 ABSENTE pour l'instant (71%5\u22600, pas de spend 2019). Pipeline recentr\u00e9: veille #71 \u2192 kangaroo C d\u00e8s fuite. Pas de brute hash160, pas de #140.",
+  "run": "bash scripts/run_focus71.sh",
+  "with_known_pub": "FOCUS71_PUBKEY=<hex> python3 -u scripts/focus71_pubkey_kangaroo.py",
+  "range": [
+    "0x400000000000000000",
+    "0x7fffffffffffffffff"
+  ],
+  "address": "1PWo3JeB9jrGwfHDNpdGK54CRas7fsVzXU",
+  "eta_if_pubkey": "~6 jours @ ~140k ops/s kangaroo C (ordre de grandeur)"
+}
