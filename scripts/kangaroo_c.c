@@ -31,3 +31,40 @@ static const u256 SECP256K1_GY = {
 };
 
 typedef struct { u256 X; u256 Y; } PointAffine;
+
+static inline void u256_add_mod(u256 *res, const u256 *a, const u256 *b) {
+    __uint128_t c = 0;
+    u256 t;
+    c = (__uint128_t)a->d[0] + b->d[0]; t.d[0] = (uint64_t)c; c >>= 64;
+    c += (__uint128_t)a->d[1] + b->d[1]; t.d[1] = (uint64_t)c; c >>= 64;
+    c += (__uint128_t)a->d[2] + b->d[2]; t.d[2] = (uint64_t)c; c >>= 64;
+    c += (__uint128_t)a->d[3] + b->d[3]; t.d[3] = (uint64_t)c; c >>= 64;
+    if (c || (t.d[3] == 0xFFFFFFFFFFFFFFFFULL && t.d[2] == 0xFFFFFFFFFFFFFFFFULL &&
+              t.d[1] == 0xFFFFFFFFFFFFFFFFULL && t.d[0] >= 0xFFFFFFFEFFFFFC2FULL)) {
+        __int128_t borrow = 0;
+        borrow = (__int128_t)t.d[0] - SECP256K1_P.d[0]; res->d[0] = (uint64_t)borrow; borrow >>= 64;
+        borrow += (__int128_t)t.d[1] - SECP256K1_P.d[1]; res->d[1] = (uint64_t)borrow; borrow >>= 64;
+        borrow += (__int128_t)t.d[2] - SECP256K1_P.d[2]; res->d[2] = (uint64_t)borrow; borrow >>= 64;
+        borrow += (__int128_t)t.d[3] - SECP256K1_P.d[3]; res->d[3] = (uint64_t)borrow;
+    } else {
+        *res = t;
+    }
+}
+
+static inline void u256_sub_mod(u256 *res, const u256 *a, const u256 *b) {
+    __int128_t borrow = 0;
+    u256 t;
+    borrow = (__int128_t)a->d[0] - b->d[0]; t.d[0] = (uint64_t)borrow; borrow >>= 64;
+    borrow += (__int128_t)a->d[1] - b->d[1]; t.d[1] = (uint64_t)borrow; borrow >>= 64;
+    borrow += (__int128_t)a->d[2] - b->d[2]; t.d[2] = (uint64_t)borrow; borrow >>= 64;
+    borrow += (__int128_t)a->d[3] - b->d[3]; t.d[3] = (uint64_t)borrow; borrow >>= 64;
+    if (borrow != 0) {
+        __uint128_t c = 0;
+        c = (__uint128_t)t.d[0] + SECP256K1_P.d[0]; res->d[0] = (uint64_t)c; c >>= 64;
+        c += (__uint128_t)t.d[1] + SECP256K1_P.d[1]; res->d[1] = (uint64_t)c; c >>= 64;
+        c += (__uint128_t)t.d[2] + SECP256K1_P.d[2]; res->d[2] = (uint64_t)c; c >>= 64;
+        c += (__uint128_t)t.d[3] + SECP256K1_P.d[3]; res->d[3] = (uint64_t)c;
+    } else {
+        *res = t;
+    }
+}
